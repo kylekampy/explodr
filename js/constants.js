@@ -6,7 +6,7 @@
 // for everything in the 'physics' of the game
 
 // The number of balls to add to the level number for a level
-var BALLS_ADDED_TO_LEVEL = 99;
+var BALLS_ADDED_TO_LEVEL = 24;
 
 // The radius of a regular, non-actioning ball
 var BALL_RADIUS = 5;
