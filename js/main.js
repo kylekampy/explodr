@@ -31,6 +31,9 @@ var mPalette = null;
 // The current level
 var mLevel = 1;
 
+// The audio handler
+var mAudioHandler = null;
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Functions
@@ -56,6 +59,9 @@ function Init(){
 
     // Now build the balls for the first level
     BuildBalls(mLevel);
+
+    // Build the audio handler
+    mAudioHandler = new AudioHandler();
 
     // Bind a mouse click event to the canvas
     mCanvas.click(function(event){
@@ -131,18 +137,20 @@ function BuildPalettes(){
 // The intent of this function is to build all of the balls for the
 // given level.
 function BuildBalls(level){
-    // The number of balls is equal to the level plus 5
-    var numBalls = level + 19;
+    // The number of balls is equal to the level plus the level constant
+    var numBalls = level + BALLS_ADDED_TO_LEVEL;
 
     // Build each ball
     for (var i=0; i<numBalls; i++){
         mBalls.push(
             new Ball(
-                (Math.random() * (mWidth-10)) + 5, // x pos
-                (Math.random() * (mHeight-10)) + 5, // y pos
+                Math.random() *
+                    (mWidth - (BALL_RADIUS * 2)) + BALL_RADIUS, // x pos
+                Math.random() *
+                    (mWidth - (BALL_RADIUS * 2)) + BALL_RADIUS, // y pos
                 GenerateVelocity(), // velocity x
                 GenerateVelocity(), // velocity y
-                5, // radius
+                BALL_RADIUS, // radius
                 mPalette[Math.floor(Math.random() * mPalette.length)] // color
                 )
             );
@@ -155,8 +163,8 @@ function BuildBalls(level){
 // The absolute value will always be greater than 1
 function GenerateVelocity(){
     var x = 0;
-    while(Math.abs(x) < 1){
-        x = (Math.random() * 5) - 2.5;
+    while(Math.abs(x) < MIN_VELOCITY){
+        x = (Math.random() * MAX_VELOCITY * 2) - MAX_VELOCITY;
     }
     return x;
 }
@@ -172,10 +180,10 @@ function UpdateBalls(){
             ball.radius += ball.rateOfExpansion;
 
             // Slow the rate of expansion by 10%
-            ball.rateOfExpansion *= 0.90;
+            ball.rateOfExpansion *= RATE_OF_DECELERATION;
 
             // Check if the rate of expansion is low enough to stop
-            if (ball.rateOfExpansion < 0.05){
+            if (ball.rateOfExpansion < MIN_RATE_OF_EXPANSION){
                 // Stop expanding
                 ball.rateOfExpansion = 0;
 
@@ -196,26 +204,28 @@ function UpdateBalls(){
             ball.radius += ball.rateOfExpansion;
 
             // Accelerate the rate of expansion by 10%
-            ball.rateOfExpansion *= 1.10;
+            ball.rateOfExpansion *= RATE_OF_ACCELERATION;
 
             // Check if it's radius has dropped below zero
             if (ball.radius <= 0){
-                // Wow, it's dead.
+                // Wow, ball. RIP.
                 ball.markAsDead();
             }
         }else{ // The ball is moving! Collision checks
             // Check if the ball has hit an 'x' wall
-            if (ball.x <= 2.5 ||
-                ball.x >= mWidth - 2.5){
-                
+            if (ball.x <= BALL_RADIUS){
+                // Reverse the velocity (bounce)
+                ball.velocityX = -ball.velocityX;
+            }else if (ball.x >= mWidth - BALL_RADIUS){
                 // Reverse the x velocity (bounce)
                 ball.velocityX = -ball.velocityX;
             }
 
             // Check if the ball has hit a 'y' wall
-            if (ball.y <= 2.5 ||
-                ball.y >= mHeight - 2.5){
-                
+            if (ball.y <= BALL_RADIUS){
+                // Reverse the y velocity (bounce)
+                ball.velocityY = -ball.velocityY;
+            }else if (ball.y >= mHeight - BALL_RADIUS){
                 // Reverse the y velocity (bounce)
                 ball.velocityY = -ball.velocityY;
             }
@@ -223,6 +233,7 @@ function UpdateBalls(){
             // Now check if this ball has hit any actionable ball
             if (HasBallHitActioningBall(ball)){
                 ball.explode();
+                mAudioHandler.pop();
             }else{
                 // Update the position
                 ball.x += ball.velocityX;
@@ -349,12 +360,13 @@ function RespondToClick(mousePos){
             mousePos.y, // y pos
             0, // x vel (not moving)
             0, // y vel (not moving)
-            1, // radius
+            EXPLODING_BALL_STARTING_RADIUS, // radius
             mPalette[Math.floor(Math.random() * mPalette.length)] // color
         );
 
     // Tell the ball to explode
     explodingBall.explode();
+    mAudioHandler.pop();
 
     // Push it to our array of balls
     mBalls.push(explodingBall);
