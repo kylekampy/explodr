@@ -209,7 +209,8 @@ function UpdateBalls(){
         var ball = mBalls[i];
         
         if (ball.isDead){
-            // Nothing to do with a dead ball.
+            // Yikes. Remove it from our array.
+            mBalls.splice(i,1);
         }else if (ball.isExpanding){
             // Update the radius
             ball.radius += ball.rateOfExpansion;
@@ -425,3 +426,8 @@ window.onload = function(){
     Run();
     
 };
+
+// FOR COCOONJS -- Add the window
+mCanvas = document.createElement("canvas");
+document.body.appendChild(mCanvas);
+
