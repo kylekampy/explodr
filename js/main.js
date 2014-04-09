@@ -13,6 +13,9 @@ var mDebug = true;
 // The canvas element
 var mCanvas = null;
 
+// The context of the canvas
+var mContext = null;
+
 // The width of the canvas
 var mWidth = 0;
 
@@ -69,6 +72,9 @@ function Init(){
 
     // Calculate the ball radius
     mRadius = BALL_RADIUS_PERCENTAGE * mWidth;
+
+    // Get the context of the canvas
+    mContext = mCanvas.getContext('2d');
 
     // Calculate the min and max velocities
     mMinVelocity = MIN_VELOCITY_PERCENTAGE * mWidth;
@@ -207,6 +213,9 @@ function UpdateBalls(){
     for (var i=0; i<mBalls.length; i++){
         // Get the current ball
         var ball = mBalls[i];
+
+        // Before moving it, clear the space it is currently taking up
+        ClearOldBall(ball);
         
         if (ball.isDead){
             // Yikes. Remove it from our array.
@@ -337,8 +346,7 @@ function HasBallHitActioningBall(ball){
 // This function redraws everything
 function Draw(){
     // Clear the canvas
-    var context = mCanvas.getContext('2d');
-    context.clearRect(0,0,mWidth,mHeight);
+// mContext.clearRect(0,0,mWidth,mHeight);
     
     // Draw each ball
     for (var i=0; i<mBalls.length; i++){
@@ -346,24 +354,33 @@ function Draw(){
         var ball = mBalls[i];
 
         // Draw it
-        DrawBall(context, ball);
+        DrawBall(ball);
     };
 }
 
+// This function clears the space taken up by an old ball
+function ClearOldBall(ball){
+    // Clear the old ball
+    mContext.clearRect(ball.x - ball.radius - 2,
+                       ball.y - ball.radius - 2,
+                       ball.radius * 2 + 4,
+                       ball.radius * 2 + 4);
+}
+
 // This function draws an individual ball
-function DrawBall(context, ball){
-    context.beginPath();
-    context.arc(Math.floor(ball.x),
-                Math.floor(ball.y),
-                ball.radius,
-                0,
-                2 * Math.PI,
-                false);
-    context.fillStyle = ball.color;
-    context.fill();
-    context.lineWidth = 1;
-    context.strokeStyle = ball.color;
-    context.stroke();
+function DrawBall(ball){
+    mContext.beginPath();
+    mContext.arc(ball.x,
+                 ball.y,
+                 ball.radius,
+                 0,
+                 2 * Math.PI,
+                 false);
+    mContext.fillStyle = ball.color;
+    mContext.fill();
+    mContext.lineWidth = 1;
+    mContext.strokeStyle = ball.color;
+    mContext.stroke();
 }
 
 // This function is called once to start the game
