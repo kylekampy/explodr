@@ -57,15 +57,15 @@ var mAudioHandler = null;
 // This function initializes all of our member variables
 function Init(){
     // Get the canvas
-    mCanvas = $('#game');
+    mCanvas = document.getElementById('game');
 
     // Get the width and height of the canvas
     mWidth = window.innerWidth;
     mHeight = mWidth;
 
     // Set the size of the canvas appropriately
-    mCanvas.attr('width', mWidth);
-    mCanvas.attr('height', mHeight);
+    mCanvas.setAttribute('width', mWidth);
+    mCanvas.setAttribute('height', mHeight);
 
     // Calculate the ball radius
     mRadius = BALL_RADIUS_PERCENTAGE * mWidth;
@@ -94,7 +94,7 @@ function Init(){
     mAudioHandler = new AudioHandler();
 
     // Bind a mouse click event to the canvas
-    mCanvas.click(function(event){
+    mCanvas.addEventListener('click', function(event){
         RespondToClick(GetMousePosition(event));
     });
 
@@ -204,7 +204,10 @@ function GenerateVelocity(){
 // This function updates everything
 function UpdateBalls(){
     // Loop through each ball
-    $.each(mBalls, function(idx, ball){
+    for (var i=0; i<mBalls.length; i++){
+        // Get the current ball
+        var ball = mBalls[i];
+        
         if (ball.isDead){
             // Nothing to do with a dead ball.
         }else if (ball.isExpanding){
@@ -272,7 +275,7 @@ function UpdateBalls(){
                 ball.y += ball.velocityY;
             }
         }
-    });
+    };
 }
 
 // This function updates the score
@@ -288,8 +291,7 @@ function UpdateScoreboard(){
         }
     }
 
-    // Update the text in the scoreboard div
-    $('#balls_left').text(count);
+    // TODO -- Paint it somewhere on the canvas
 }
 
 // This function does collision checking to see if the provided
@@ -334,13 +336,17 @@ function HasBallHitActioningBall(ball){
 // This function redraws everything
 function Draw(){
     // Clear the canvas
-    var context = mCanvas[0].getContext('2d');
+    var context = mCanvas.getContext('2d');
     context.clearRect(0,0,mWidth,mHeight);
     
     // Draw each ball
-    $.each(mBalls, function(inx, ball){
+    for (var i=0; i<mBalls.length; i++){
+        // Get the current ball
+        var ball = mBalls[i];
+
+        // Draw it
         DrawBall(context, ball);
-    });
+    };
 }
 
 // This function draws an individual ball
@@ -376,7 +382,7 @@ function Run(){
 
 // This function will get the click position
 function GetMousePosition(event){
-    var rect = mCanvas[0].getBoundingClientRect();
+    var rect = mCanvas.getBoundingClientRect();
     return {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top
@@ -408,8 +414,8 @@ function RespondToClick(mousePos){
     // That's it!
 }
 
-//// Execution Start ////
-$(function(){
+//// Execution Start ////n
+window.onload = function(){
     // TODO -- Show loading spinner
 
     // Init members
@@ -418,4 +424,4 @@ $(function(){
     // Start the game loop
     Run();
     
-});
+};
