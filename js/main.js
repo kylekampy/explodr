@@ -28,6 +28,21 @@ var mPalettes = [];
 // The color palette
 var mPalette = null;
 
+// The actual built ball radius
+var mRadius = 0;
+
+// The built min velocity
+var mMinVelocity = 0;
+
+// The built max velocity
+var mMaxVelocity = 0;
+
+// The built rate of expansion
+var mRateOfExpansion = 0;
+
+// The built rate of shrinkage
+var mRateOfShrinkage = 0;
+
 // The current level
 var mLevel = 1;
 
@@ -45,8 +60,23 @@ function Init(){
     mCanvas = $('#game');
 
     // Get the width and height of the canvas
-    mWidth = mCanvas.width();
-    mHeight = mCanvas.height();
+    mWidth = window.innerWidth;
+    mHeight = mWidth;
+
+    // Set the size of the canvas appropriately
+    mCanvas.attr('width', mWidth);
+    mCanvas.attr('height', mHeight);
+
+    // Calculate the ball radius
+    mRadius = BALL_RADIUS_PERCENTAGE * mWidth;
+
+    // Calculate the min and max velocities
+    mMinVelocity = MIN_VELOCITY_PERCENTAGE * mWidth;
+    mMaxVelocity = MAX_VELOCITY_PERCENTAGE * mWidth;
+
+    // Calculate the rate of expansion and shrinkage
+    mRateOfExpansion = RATE_OF_EXPANSION_PERCENTAGE * mWidth;
+    mRateOfShrinkage = RATE_OF_SHRINKAGE_PERCENTAGE * mWidth;
 
     // Debug message
     if (mDebug){
@@ -97,17 +127,6 @@ function BuildPalettes(){
             "#FA6900"
         ]);
 
-    // Though Provoking by Miss_Anthropy
-    // http://www.colourlovers.com/palette/694737/Thought_Provoking
-    mPalettes.push(
-        [
-            "#ECD078",
-            "#D95B43",
-            "#C02942",
-            "#542437",
-            "#53777A"
-        ]);
-
     // Cheer up emo kid by electrikmonk
     // http://www.colourlovers.com/palette/1930/cheer_up_emo_kid
     mPalettes.push(
@@ -130,6 +149,17 @@ function BuildPalettes(){
             "#EDC951"
         ]);
 
+    // Gamebookers by plamenj
+    // http://www.colourlovers.com/palette/148712/Gamebookers
+    mPalettes.push(
+        [
+            "#FF9900",
+            "#424242",
+            "#E9E9E9",
+            "#BCBCBC",
+            "#3299BB"
+        ]);
+
     // Finally, set the current palette to one of these
     mPalette = mPalettes[Math.floor(Math.random() * mPalettes.length)];
 }
@@ -139,19 +169,21 @@ function BuildPalettes(){
 function BuildBalls(level){
     // The number of balls is equal to the level plus the level constant
     var numBalls = level + BALLS_ADDED_TO_LEVEL;
-
+    
     // Build each ball
     for (var i=0; i<numBalls; i++){
         mBalls.push(
             new Ball(
                 Math.random() *
-                    (mWidth - (BALL_RADIUS * 2)) + BALL_RADIUS, // x pos
+                    (mWidth - (mRadius * 2)) + mRadius, // x pos
                 Math.random() *
-                    (mWidth - (BALL_RADIUS * 2)) + BALL_RADIUS, // y pos
+                    (mWidth - (mRadius * 2)) + mRadius, // y pos
                 GenerateVelocity(), // velocity x
                 GenerateVelocity(), // velocity y
-                BALL_RADIUS, // radius
-                mPalette[Math.floor(Math.random() * mPalette.length)] // color
+                mRadius, // radius
+                mPalette[Math.floor(Math.random() * mPalette.length)], // color
+                mRateOfExpansion, // calculated rate of expansion
+                mRateOfShrinkage
                 )
             );
     }
@@ -163,8 +195,8 @@ function BuildBalls(level){
 // The absolute value will always be greater than 1
 function GenerateVelocity(){
     var x = 0;
-    while(Math.abs(x) < MIN_VELOCITY){
-        x = (Math.random() * MAX_VELOCITY * 2) - MAX_VELOCITY;
+    while(Math.abs(x) < mMinVelocity){
+        x = (Math.random() * mMaxVelocity * 2) - mMaxVelocity;
     }
     return x;
 }
@@ -201,10 +233,10 @@ function UpdateBalls(){
             }
         }else if (ball.isShrinking){
             // Update the radius
-            ball.radius += ball.rateOfExpansion;
+            ball.radius += ball.rateOfShrinkage;
 
             // Accelerate the rate of expansion by 10%
-            ball.rateOfExpansion *= RATE_OF_ACCELERATION;
+            ball.rateOfShrinkage *= RATE_OF_ACCELERATION;
 
             // Check if it's radius has dropped below zero
             if (ball.radius <= 0){
@@ -213,19 +245,19 @@ function UpdateBalls(){
             }
         }else{ // The ball is moving! Collision checks
             // Check if the ball has hit an 'x' wall
-            if (ball.x <= BALL_RADIUS){
+            if (ball.x <= mRadius){
                 // Reverse the velocity (bounce)
                 ball.velocityX = -ball.velocityX;
-            }else if (ball.x >= mWidth - BALL_RADIUS){
+            }else if (ball.x >= mWidth - mRadius){
                 // Reverse the x velocity (bounce)
                 ball.velocityX = -ball.velocityX;
             }
 
             // Check if the ball has hit a 'y' wall
-            if (ball.y <= BALL_RADIUS){
+            if (ball.y <= mRadius){
                 // Reverse the y velocity (bounce)
                 ball.velocityY = -ball.velocityY;
-            }else if (ball.y >= mHeight - BALL_RADIUS){
+            }else if (ball.y >= mHeight - mRadius){
                 // Reverse the y velocity (bounce)
                 ball.velocityY = -ball.velocityY;
             }
@@ -360,8 +392,10 @@ function RespondToClick(mousePos){
             mousePos.y, // y pos
             0, // x vel (not moving)
             0, // y vel (not moving)
-            EXPLODING_BALL_STARTING_RADIUS, // radius
-            mPalette[Math.floor(Math.random() * mPalette.length)] // color
+            mRadius,
+            mPalette[Math.floor(Math.random() * mPalette.length)], // color
+            mRateOfExpansion, // calculated rate of expansion
+            mRateOfShrinkage // calculated rate of shrinkage
         );
 
     // Tell the ball to explode

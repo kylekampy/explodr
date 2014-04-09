@@ -18,17 +18,15 @@
 // - isDead
 
 // Ball class w/ constructor
-function Ball(x, y, vX, vY,
-              r, clr, expanding,
-              shrinking, rateOfExpansion,
-              dead
-             ) {
+function Ball(x, y, vX, vY, r, clr, rateOfExpansion, rateOfShrinkage) {
     this.x = x;
     this.y = y;
     this.velocityX = vX;
     this.velocityY = vY;
     this.radius = r;
     this.color = clr;
+    this.rateOfExpansion = rateOfExpansion;
+    this.rateOfShrinkage = rateOfShrinkage;
 
     // Some default values we need
     this.isActioning = false;
@@ -36,7 +34,6 @@ function Ball(x, y, vX, vY,
     this.isExpanded = false;
     this.framesTilDeath = BALL_LIFESPAN;
     this.isShrinking = false;
-    this.rateOfExpansion = 0;
     this.isDead = false;
 
     /////////////////////////////////////////////////////////////////////////////
@@ -52,9 +49,6 @@ function Ball(x, y, vX, vY,
         // Set isExpanding to true
         this.isActioning = true;
         this.isExpanding = true;
-
-        // Set the rate of expansion to the default
-        this.rateOfExpansion = RATE_OF_EXPANSION;
     };
 
     // A function to make this ball die
@@ -69,9 +63,6 @@ function Ball(x, y, vX, vY,
 
         // And we are no longer expanded
         this.isExpanded = false;
-
-        // Set the rate of expansion to the default
-        this.rateOfExpansion = RATE_OF_SHRINKAGE;
     };
 
     // A function to mark the ball as dead
