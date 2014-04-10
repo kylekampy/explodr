@@ -15,6 +15,10 @@ function AudioHandler(){
     sounds.push(new Howl({urls: ["audio/pop3.mp3"]}));
     sounds.push(new Howl({urls: ["audio/pop4.mp3"]}));
 
+    // Immediately play each sound, at low volume to have them cached
+    
+    
+
     // This function plays a random sound
     this.pop = function(){
         sounds[Math.floor(Math.random() * sounds.length)].play();

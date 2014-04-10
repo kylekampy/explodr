@@ -6,10 +6,10 @@
 // for everything in the 'physics' of the game
 
 // The number of balls to add to the level number for a level
-var BALLS_ADDED_TO_LEVEL = 24;
+var BALLS_ADDED_TO_LEVEL = 99;
 
 // The radius of a regular, non-actioning ball as a percentage of the width
-var BALL_RADIUS_PERCENTAGE = 0.01;
+var BALL_RADIUS_PERCENTAGE = 0.012;
 
 // The minimum velocity in either x or y direction, as a percentage of the width
 var MIN_VELOCITY_PERCENTAGE = 0.002;
@@ -17,8 +17,8 @@ var MIN_VELOCITY_PERCENTAGE = 0.002;
 // The maximum velocity in either x or y direction
 var MAX_VELOCITY_PERCENTAGE = 0.005;
 
-// Default exploding rate of expansion as a percentage of the width
-var RATE_OF_EXPANSION_PERCENTAGE = 0.006;
+// Default exploding rate of expansion as a percentage of the radius
+var RATE_OF_EXPANSION_PERCENTAGE = 0.6;
 
 // The rate of expansion
 var RATE_OF_DECELERATION = 0.90;
@@ -35,3 +35,5 @@ var MIN_RATE_OF_EXPANSION = 0.05;
 // Default frames til death
 var BALL_LIFESPAN = 60;
 
+// Background color
+var BACKGROUND_COLOR = "#FFFFFF";
